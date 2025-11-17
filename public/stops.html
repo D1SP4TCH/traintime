@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Available Stops - MTA Departures</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #020314;
+      color: #f7f7f7;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .filter {
+      margin-bottom: 20px;
+    }
+    .filter input {
+      padding: 8px;
+      font-size: 14px;
+      width: 300px;
+      background: #1a1a2e;
+      color: #f7f7f7;
+      border: 1px solid #333;
+      border-radius: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    th {
+      background: rgba(255,255,255,0.05);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+    }
+    .route {
+      display: inline-block;
+      padding: 2px 8px;
+      background: #ffcc00;
+      color: #000;
+      border-radius: 3px;
+      font-weight: 600;
+      font-size: 11px;
+      margin-right: 4px;
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: #ffcc00;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/" class="back-link">← Back to Departure Board</a>
+    <h1>Available Stops</h1>
+    <div class="filter">
+      <input type="text" id="filter" placeholder="Filter by stop ID, route, or station name...">
+    </div>
+    <div id="info"></div>
+    <table>
+      <thead>
+        <tr>
+          <th>Stop ID</th>
+          <th>Routes</th>
+          <th>Station Name</th>
+          <th>Departures</th>
+        </tr>
+      </thead>
+      <tbody id="stops-table"></tbody>
+    </table>
+  </div>
+
+  <script>
+    async function loadStops() {
+      try {
+        // Add cache busting to ensure fresh data
+        const res = await fetch("/api/debug/stops?t=" + Date.now());
+        const data = await res.json();
+        
+        document.getElementById("info").textContent = 
+          `Total: ${data.total} stops (showing ${data.stops.length})`;
+        
+        // Log for debugging
+        console.log("Loaded stops:", data.stops.length);
+        if (data.stops.length > 0) {
+          console.log("Sample stop:", data.stops[0]);
+        }
+        
+        renderStops(data.stops);
+        
+        document.getElementById("filter").addEventListener("input", (e) => {
+          const filter = e.target.value.toLowerCase();
+          const filtered = data.stops.filter(s => 
+            s.stopId.toLowerCase().includes(filter) ||
+            s.routes.some(r => r.toLowerCase().includes(filter)) ||
+            (s.stationName && s.stationName.toLowerCase().includes(filter))
+          );
+          renderStops(filtered);
+        });
+      } catch (err) {
+        console.error("Error loading stops:", err);
+        document.getElementById("stops-table").innerHTML = 
+          "<tr><td colspan='4'>Error loading stops</td></tr>";
+      }
+    }
+
+    function renderStops(stops) {
+      const tbody = document.getElementById("stops-table");
+      if (stops.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='4'>No stops found</td></tr>";
+        return;
+      }
+      
+      tbody.innerHTML = stops.map(s => `
+        <tr>
+          <td><code>${s.stopId}</code></td>
+          <td>${s.routes.map(r => `<span class="route">${r}</span>`).join("")}</td>
+          <td>${s.stationName || s.stopId}</td>
+          <td>${s.count}</td>
+        </tr>
+      `).join("");
+    }
+
+    loadStops();
+  </script>
+</body>
+</html>
+

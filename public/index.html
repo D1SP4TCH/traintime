@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MTA Departures</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro", sans-serif;
+      background: #020314;
+      color: #f7f7f7;
+      overflow-x: hidden;
+    }
+
+    .board {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .board-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid rgba(255,255,255,0.2);
+    }
+
+    .board-title {
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      font-size: 16px;
+      text-transform: uppercase;
+    }
+
+    .board-clock {
+      font-size: 14px;
+      opacity: 0.7;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 80px minmax(0, 1.4fr) 70px 60px;
+      gap: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      align-items: center;
+    }
+
+    .row.header {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.7;
+      border-bottom-color: rgba(255,255,255,0.25);
+      padding: 8px 12px;
+      font-weight: 600;
+    }
+
+    .row .route-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      height: 24px;
+      padding: 0 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .row .station {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 13px;
+    }
+
+    .time {
+      font-variant-numeric: tabular-nums;
+      font-size: 13px;
+    }
+
+    .mins {
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      font-size: 14px;
+      text-align: right;
+    }
+
+    .mins.soon {
+      color: #ffcc00;
+    }
+
+    .status {
+      font-size: 11px;
+      opacity: 0.8;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      opacity: 0.5;
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .row {
+        grid-template-columns: 70px minmax(0, 1fr) 60px 50px;
+        gap: 8px;
+        font-size: 13px;
+      }
+      .board {
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="board">
+    <div class="board-header">
+      <div class="board-title">MTA Departures</div>
+      <div class="board-clock" id="clock"></div>
+    </div>
+
+    <div class="row header">
+      <div>Time</div>
+      <div>Destination</div>
+      <div>Route</div>
+      <div>Min</div>
+    </div>
+
+    <div id="rows"></div>
+  </div>
+
+  <script>
+    // Houston St - Line 1
+    // 134N = Houston St (Uptown/Northbound)
+    // 134S = Houston St (Downtown/Southbound)
+    // Spring St - ACE Line
+    // A33N = Spring St (Uptown/Northbound)
+    // A33S = Spring St (Downtown/Southbound)
+    const STOPS = ["134N", "134S", "A33N", "A33S"];
+
+    // MTA line colors
+    function getRouteColor(route) {
+      const colors = {
+        // Red lines
+        "1": "#D82233", "2": "#D82233", "3": "#D82233",
+        // Blue lines
+        "A": "#0062CF", "C": "#0062CF", "E": "#0062CF",
+        // Orange lines
+        "B": "#EB6800", "D": "#EB6800", "F": "#EB6800", "M": "#EB6800",
+        // Green lines
+        "4": "#009952", "5": "#009952", "6": "#009952",
+        // Light green
+        "G": "#799534",
+        // Brown lines
+        "J": "#8E5C33", "Z": "#8E5C33",
+        // Light gray
+        "L": "#7C858C",
+        // Yellow lines
+        "N": "#F6BC26", "Q": "#F6BC26", "R": "#F6BC26", "W": "#F6BC26",
+        // Purple
+        "7": "#9A38A1",
+        // Shuttles
+        "S": "#7C858C",
+      };
+      return colors[route] || "#ffcc00"; // Default to yellow if unknown
+    }
+
+    function getRouteTextColor(route) {
+      // Yellow routes need dark text, others use white
+      const darkTextRoutes = ["N", "Q", "R", "W"];
+      return darkTextRoutes.includes(route) ? "#000" : "#FFF";
+    }
+
+    function formatTime(ts) {
+      const d = new Date(ts);
+      return d.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"});
+    }
+
+    function updateClock() {
+      const clockEl = document.getElementById("clock");
+      if (clockEl) {
+        clockEl.textContent = new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+      }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    async function fetchDepartures() {
+      try {
+        const res = await fetch("/api/departures?stops=" + STOPS.join(","));
+        const data = await res.json();
+        const rowsEl = document.getElementById("rows");
+        
+        if (!rowsEl) return;
+
+        if (!data.departures || data.departures.length === 0) {
+          rowsEl.innerHTML = '<div class="empty-state">No departures available</div>';
+          return;
+        }
+
+        rowsEl.innerHTML = "";
+
+        const now = Date.now();
+
+        // Helper function to get the appropriate train based on run time threshold
+        // If closest train is >= threshold minutes away, show it. Otherwise show next train.
+        function getTrainForDirection(departures, stopId, direction, thresholdMinutes) {
+          const filtered = departures
+            .filter(dep => dep.stopId === stopId && dep.direction === direction)
+            .sort((a, b) => a.time - b.time);
+          
+          if (filtered.length === 0) return undefined;
+          
+          const closest = filtered[0];
+          const mins = Math.max(0, Math.round((closest.time - now) / 60000));
+          
+          // If closest train is >= threshold minutes away, show it
+          if (mins >= thresholdMinutes) {
+            return closest;
+          }
+          
+          // Otherwise, show the next train (second closest)
+          return filtered.length > 1 ? filtered[1] : closest;
+        }
+
+        // 1 train: 3 minute threshold
+        // 134N (uptown), 134S (downtown)
+        const oneUptown = getTrainForDirection(data.departures, "134N", "N", 3);
+        const oneDowntown = getTrainForDirection(data.departures, "134S", "S", 3);
+        
+        // ACE train: 5 minute threshold
+        // A33N (uptown), A33S (downtown)
+        const aceUptown = getTrainForDirection(data.departures, "A33N", "N", 5);
+        const aceDowntown = getTrainForDirection(data.departures, "A33S", "S", 5);
+        
+        const closestTrains = [oneUptown, oneDowntown, aceUptown, aceDowntown]
+          .filter(dep => dep !== undefined);
+
+        closestTrains.forEach(dep => {
+          const row = document.createElement("div");
+          row.className = "row";
+
+          const mins = Math.max(0, Math.round((dep.time - now) / 60000));
+          const minsClass = mins <= 2 ? "soon" : "";
+
+          // Determine direction from stop ID (N = Uptown, S = Downtown, E = Eastbound, W = Westbound)
+          const direction = dep.direction === "N" ? "Uptown" : 
+                           dep.direction === "S" ? "Downtown" :
+                           dep.direction === "E" ? "Eastbound" :
+                           dep.direction === "W" ? "Westbound" : dep.direction;
+          
+          // Determine line name from stop ID
+          const lineName = dep.stopId.startsWith("134") ? "1 Train" : "ACE";
+          
+          // Use destination (final stop) if available, otherwise fall back to station name
+          const destination = dep.destination || dep.stationName || "Unknown";
+          const displayName = `${lineName} - ${destination} (${direction})`;
+
+          // Get route colors
+          const routeColor = getRouteColor(dep.route);
+          const routeTextColor = getRouteTextColor(dep.route);
+
+          row.innerHTML = `
+            <div class="time">${formatTime(dep.time)}</div>
+            <div class="station">${displayName}</div>
+            <div><span class="route-pill" style="background: ${routeColor}; color: ${routeTextColor};">${dep.route}</span></div>
+            <div class="mins ${minsClass}">${mins}</div>
+          `;
+
+          rowsEl.appendChild(row);
+        });
+      } catch (err) {
+        console.error("Error fetching departures:", err);
+        const rowsEl = document.getElementById("rows");
+        if (rowsEl) {
+          rowsEl.innerHTML = '<div class="empty-state">Error loading departures</div>';
+        }
+      }
+    }
+
+    // Initial fetch
+    fetchDepartures();
+    // Refresh every 15 seconds
+    setInterval(fetchDepartures, 15000);
+  </script>
+</body>
+</html>
+
