@@ -68,6 +68,9 @@ Object.assign(STOP_NAME_MAP, MANUAL_STOP_NAMES);
 let cachedDepartures: Departure[] = [];
 let lastFetch = 0;
 
+// Dynamic station names learned from GTFS-RT feed
+let learnedStationNames: Record<string, string> = {};
+
 async function fetchSubwayFeed(): Promise<void> {
   const allDepartures: Departure[] = [];
   
@@ -126,18 +129,26 @@ async function fetchSubwayFeed(): Promise<void> {
           const arrivalTime = stu.arrival?.time;
           const departureTime = stu.departure?.time;
           const timeValue = arrivalTime || departureTime;
-          
+
           if (!timeValue) return;
 
           // Convert Long to number if needed, then to milliseconds
-          const timeSeconds = typeof timeValue === 'number' 
-            ? timeValue 
+          const timeSeconds = typeof timeValue === 'number'
+            ? timeValue
             : (timeValue as any).toNumber ? (timeValue as any).toNumber() : Number(timeValue);
           const timeMs = timeSeconds * 1000;
 
+          // Learn station name from final destination if we don't have it
+          if (finalDestination && !learnedStationNames[stopId] && finalDestination !== stopId) {
+            learnedStationNames[stopId] = finalDestination;
+          }
+
+          // Use learned names, then STOP_NAME_MAP, then fallback to stopId
+          const stationName = STOP_NAME_MAP[stopId] || learnedStationNames[stopId] || stopId;
+
           allDepartures.push({
             stopId,
-            stationName: STOP_NAME_MAP[stopId] || stopId,
+            stationName,
             route,
             direction: stopId.slice(-1),
             time: timeMs,

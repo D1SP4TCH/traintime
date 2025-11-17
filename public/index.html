@@ -188,7 +188,8 @@
       max-width: 600px;
       width: 90%;
       max-height: 80vh;
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
       animation: slideUp 0.3s;
       box-shadow: 0 20px 60px rgba(0,0,0,0.5);
     }
@@ -229,6 +230,9 @@
 
     .modal-body {
       padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+      min-height: 0;
     }
 
     .station-list {
@@ -280,12 +284,53 @@
       opacity: 0.6;
     }
 
+    .search-box {
+      margin-bottom: 16px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
+      color: #f7f7f7;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #4287f5;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .search-input::placeholder {
+      color: rgba(247,247,247,0.4);
+    }
+
+    .section-header {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+      margin-top: 16px;
+      margin-bottom: 8px;
+      padding-left: 4px;
+    }
+
+    .section-header:first-child {
+      margin-top: 0;
+    }
+
     .modal-footer {
       padding: 16px 24px;
       border-top: 1px solid rgba(255,255,255,0.1);
       display: flex;
       gap: 12px;
       justify-content: flex-end;
+      flex-shrink: 0;
     }
 
     .btn {
@@ -422,6 +467,14 @@
         <button class="close-btn" onclick="closeSettings()">&times;</button>
       </div>
       <div class="modal-body">
+        <div class="search-box">
+          <input
+            type="text"
+            class="search-input"
+            id="stationSearch"
+            placeholder="Search all stations..."
+          />
+        </div>
         <div class="station-list" id="stationList"></div>
       </div>
       <div class="modal-footer">
@@ -432,32 +485,130 @@
   </div>
 
   <script>
-    // Popular NYC Subway Stations (curated list)
+    // Comprehensive NYC Subway Stations mapping
     const POPULAR_STATIONS = [
-      { name: "Times Square - 42nd St", stops: ["127N", "127S"], lines: "1,2,3,7,N,Q,R,W,S" },
-      { name: "Grand Central - 42nd St", stops: ["631N", "631S"], lines: "4,5,6,7" },
-      { name: "Union Square - 14th St", stops: ["R20N", "R20S"], lines: "4,5,6,L,N,Q,R,W" },
-      { name: "Herald Square - 34th St", stops: ["R16N", "R16S"], lines: "B,D,F,M,N,Q,R,W" },
-      { name: "Columbus Circle - 59th St", stops: ["A11N", "A11S"], lines: "A,C,B,D,1" },
-      { name: "Fulton St", stops: ["A38N", "A38S"], lines: "A,C,2,3,4,5,J,Z" },
-      { name: "Atlantic Ave - Barclays Ctr", stops: ["D24N", "D24S"], lines: "B,D,N,Q,R,2,3,4,5" },
+      // Manhattan - 1 Line
+      { name: "South Ferry", stops: ["142N", "142S"], lines: "1" },
+      { name: "Rector St", stops: ["141N", "141S"], lines: "1" },
+      { name: "Cortlandt St", stops: ["140N", "140S"], lines: "1" },
+      { name: "Chambers St", stops: ["139N", "139S", "A36N", "A36S"], lines: "1,2,3,A,C" },
+      { name: "Franklin St", stops: ["138N", "138S"], lines: "1" },
+      { name: "Canal St", stops: ["137N", "137S", "A34N", "A34S", "R20N", "R20S", "629N", "629S"], lines: "1,A,C,E,N,Q,R,W,J,Z,6" },
       { name: "Houston St", stops: ["134N", "134S"], lines: "1" },
-      { name: "Spring St", stops: ["A33N", "A33S"], lines: "A,C,E" },
-      { name: "Canal St", stops: ["A34N", "A34S"], lines: "A,C,E,N,Q,R,W,J,Z,6" },
-      { name: "14th St - Union Sq", stops: ["L15N", "L15S"], lines: "L,4,5,6,N,Q,R,W" },
-      { name: "Lexington Ave/53rd St", stops: ["D14N", "D14S"], lines: "E,M" },
-      { name: "42nd St - Port Authority", stops: ["A25N", "A25S"], lines: "A,C,E" },
-      { name: "Brooklyn Bridge - City Hall", stops: ["423N", "423S"], lines: "4,5,6" },
+      { name: "Christopher St - Sheridan Sq", stops: ["133N", "133S"], lines: "1" },
+      { name: "14th St", stops: ["132N", "132S", "L15N", "L15S", "R20N", "R20S"], lines: "1,2,3,L,F,M,N,Q,R,W" },
+      { name: "18th St", stops: ["131N", "131S"], lines: "1" },
+      { name: "23rd St", stops: ["130N", "130S", "R19N", "R19S", "D19N", "D19S"], lines: "1,C,E,F,M,N,R,W" },
+      { name: "28th St", stops: ["129N", "129S", "R18N", "R18S"], lines: "1,N,R,W" },
+      { name: "34th St - Penn Station", stops: ["128N", "128S", "A28N", "A28S"], lines: "1,2,3,A,C,E" },
+      { name: "Times Square - 42nd St", stops: ["127N", "127S", "R17N", "R17S", "902N", "902S"], lines: "1,2,3,7,N,Q,R,W,S" },
+      { name: "50th St", stops: ["126N", "126S"], lines: "1" },
+      { name: "59th St - Columbus Circle", stops: ["125N", "125S", "A11N", "A11S", "D20N", "D20S"], lines: "1,A,B,C,D" },
+      { name: "66th St - Lincoln Center", stops: ["124N", "124S"], lines: "1" },
+      { name: "72nd St", stops: ["123N", "123S"], lines: "1,2,3" },
+      { name: "79th St", stops: ["122N", "122S"], lines: "1" },
+      { name: "86th St", stops: ["121N", "121S"], lines: "1,4,5,6" },
       { name: "96th St", stops: ["120N", "120S"], lines: "1,2,3" },
-      { name: "125th St", stops: ["A12N", "A12S"], lines: "A,B,C,D" },
+      { name: "103rd St", stops: ["119N", "119S"], lines: "1" },
+      { name: "110th St", stops: ["118N", "118S"], lines: "1" },
+      { name: "116th St - Columbia University", stops: ["117N", "117S"], lines: "1" },
+      { name: "125th St", stops: ["116N", "116S", "A12N", "A12S", "224N", "224S"], lines: "1,A,B,C,D,2,3" },
+      { name: "137th St - City College", stops: ["115N", "115S"], lines: "1" },
+      { name: "145th St", stops: ["114N", "114S"], lines: "1,3" },
+      { name: "157th St", stops: ["113N", "113S"], lines: "1" },
+      { name: "168th St", stops: ["112N", "112S"], lines: "1,A,C" },
+      { name: "181st St", stops: ["111N", "111S"], lines: "1" },
+      { name: "191st St", stops: ["110N", "110S"], lines: "1" },
+      { name: "Dyckman St", stops: ["109N", "109S"], lines: "1" },
+      { name: "207th St", stops: ["108N", "108S"], lines: "1" },
+      { name: "215th St", stops: ["107N", "107S"], lines: "1" },
+      { name: "225th St", stops: ["106N", "106S"], lines: "1" },
+      { name: "231st St", stops: ["104N", "104S"], lines: "1" },
+      { name: "238th St", stops: ["103N", "103S"], lines: "1" },
+      { name: "Van Cortlandt Park - 242nd St", stops: ["101N", "101S"], lines: "1" },
+
+      // A,C,E Lines
+      { name: "Spring St", stops: ["A33N", "A33S"], lines: "A,C,E" },
+      { name: "West 4th St - Washington Sq", stops: ["A32N", "A32S", "D21N", "D21S"], lines: "A,C,E,B,D,F,M" },
+      { name: "14th St", stops: ["A31N", "A31S"], lines: "A,C,E" },
+      { name: "23rd St", stops: ["A30N", "A30S"], lines: "A,C,E" },
+      { name: "34th St - Penn Station", stops: ["A28N", "A28S"], lines: "A,C,E,1,2,3" },
+      { name: "42nd St - Port Authority", stops: ["A27N", "A27S"], lines: "A,C,E,N,Q,R,W,S,1,2,3,7" },
+      { name: "50th St", stops: ["A25N", "A25S"], lines: "A,C,E" },
+      { name: "Fulton St", stops: ["A38N", "A38S"], lines: "A,C,2,3,4,5,J,Z" },
+
+      // B,D,F,M Lines
+      { name: "Herald Square - 34th St", stops: ["D17N", "D17S"], lines: "B,D,F,M,N,Q,R,W" },
       { name: "Rockefeller Center - 47-50 Sts", stops: ["D15N", "D15S"], lines: "B,D,F,M" },
-      { name: "West 4th St - Washington Sq", stops: ["A32N", "A32S"], lines: "A,C,E,B,D,F,M" },
-      { name: "Chambers St", stops: ["A36N", "A36S"], lines: "A,C,1,2,3" },
-      { name: "Jay St - MetroTech", stops: ["A41N", "A41S"], lines: "A,C,F,R" },
-      { name: "Court Sq", stops: ["G21N", "G21S"], lines: "E,M,G,7" },
-      { name: "Jackson Heights - Roosevelt Ave", stops: ["E06N", "E06S"], lines: "E,F,M,R,7" },
+      { name: "Lexington Ave/53rd St", stops: ["D14N", "D14S"], lines: "E,M" },
+      { name: "7 Av", stops: ["D13N", "D13S"], lines: "B,D,E" },
+
+      // 4,5,6 Lines
+      { name: "Brooklyn Bridge - City Hall", stops: ["423N", "423S"], lines: "4,5,6" },
+      { name: "Union Square - 14th St", stops: ["635N", "635S", "R20N", "R20S", "L15N", "L15S"], lines: "4,5,6,L,N,Q,R,W" },
+      { name: "Grand Central - 42nd St", stops: ["631N", "631S", "902N", "902S"], lines: "4,5,6,7,S" },
+      { name: "59th St", stops: ["621N", "621S"], lines: "4,5,6" },
+
+      // 7 Line
+      { name: "34th St - Hudson Yards", stops: ["723N", "723S"], lines: "7" },
+      { name: "Times Sq - 42nd St", stops: ["725N", "725S", "127N", "127S"], lines: "7,1,2,3,N,Q,R,W,S" },
+      { name: "5 Av", stops: ["726N", "726S"], lines: "7" },
+      { name: "Grand Central - 42nd St", stops: ["723N", "723S"], lines: "7" },
+      { name: "Vernon Blvd - Jackson Av", stops: ["712N", "712S"], lines: "7" },
+      { name: "Hunters Point Av", stops: ["711N", "711S"], lines: "7" },
+      { name: "Court Sq", stops: ["G21N", "G21S", "721N", "721S"], lines: "E,M,G,7" },
+      { name: "Queensboro Plaza", stops: ["718N", "718S"], lines: "7,N,W" },
+      { name: "33rd St", stops: ["707N", "707S"], lines: "7" },
+      { name: "40th St", stops: ["706N", "706S"], lines: "7" },
+      { name: "46th St", stops: ["705N", "705S"], lines: "7" },
+      { name: "52nd St", stops: ["704N", "704S"], lines: "7" },
+      { name: "61st St - Woodside", stops: ["702N", "702S"], lines: "7" },
+      { name: "69th St", stops: ["701N", "701S"], lines: "7" },
+      { name: "74th St - Broadway", stops: ["R09N", "R09S"], lines: "7" },
+      { name: "82nd St - Jackson Hts", stops: ["R08N", "R08S"], lines: "7" },
+      { name: "90th St - Elmhurst Av", stops: ["R07N", "R07S"], lines: "7" },
+      { name: "Junction Blvd", stops: ["R06N", "R06S"], lines: "7" },
+      { name: "103rd St - Corona Plaza", stops: ["R05N", "R05S"], lines: "7" },
+      { name: "111th St", stops: ["R04N", "R04S"], lines: "7" },
+      { name: "Mets - Willets Point", stops: ["R03N", "R03S"], lines: "7" },
+      { name: "Flushing - Main St", stops: ["R01N", "R01S"], lines: "7" },
+
+      // N,Q,R,W Lines
       { name: "Astoria Blvd", stops: ["R09N", "R09S"], lines: "N,W" },
+      { name: "Jackson Heights - Roosevelt Ave", stops: ["E06N", "E06S"], lines: "E,F,M,R,7" },
+
+      // Brooklyn
+      { name: "Atlantic Ave - Barclays Ctr", stops: ["D24N", "D24S", "R30N", "R30S"], lines: "B,D,N,Q,R,2,3,4,5" },
+      { name: "Jay St - MetroTech", stops: ["A41N", "A41S", "F18N", "F18S", "R29N", "R29S"], lines: "A,C,F,R" },
+
+      // L Line
+      { name: "8 Av", stops: ["L01N", "L01S"], lines: "L,A,C,E" },
+      { name: "6 Av", stops: ["L02N", "L02S"], lines: "L" },
+      { name: "14th St - Union Sq", stops: ["L03N", "L03S", "R20N", "R20S"], lines: "L,4,5,6,N,Q,R,W" },
+      { name: "3 Av", stops: ["L05N", "L05S"], lines: "L" },
+      { name: "1 Av", stops: ["L06N", "L06S"], lines: "L" },
+      { name: "Bedford Av", stops: ["L08N", "L08S"], lines: "L" },
+      { name: "Lorimer St", stops: ["L10N", "L10S"], lines: "L" },
+      { name: "Graham Av", stops: ["L12N", "L12S"], lines: "L" },
+      { name: "Grand St", stops: ["L13N", "L13S"], lines: "L" },
+      { name: "Montrose Av", stops: ["L14N", "L14S"], lines: "L" },
+      { name: "Morgan Av", stops: ["L16N", "L16S"], lines: "L" },
+      { name: "Jefferson St", stops: ["L17N", "L17S"], lines: "L" },
+      { name: "DeKalb Av", stops: ["L19N", "L19S"], lines: "L" },
+      { name: "Myrtle - Wyckoff Avs", stops: ["L20N", "L20S"], lines: "L,M" },
+      { name: "Halsey St", stops: ["L21N", "L21S"], lines: "L" },
+      { name: "Wilson Av", stops: ["L22N", "L22S"], lines: "L" },
+      { name: "Bushwick Av - Aberdeen St", stops: ["L24N", "L24S"], lines: "L" },
+      { name: "Broadway Junction", stops: ["L25N", "L25S"], lines: "L,A,C,J,Z" },
+      { name: "Atlantic Av", stops: ["L26N", "L26S"], lines: "L" },
+      { name: "Sutter Av", stops: ["L27N", "L27S"], lines: "L" },
+      { name: "Livonia Av", stops: ["L28N", "L28S"], lines: "L" },
+      { name: "New Lots Av", stops: ["L29N", "L29S"], lines: "L" },
+      { name: "Canarsie - Rockaway Pkwy", stops: ["L29N", "L29S"], lines: "L" },
     ];
+
+    // All stations loaded from API
+    let ALL_STATIONS = [];
 
     // Default stations (Houston St + Spring St)
     const DEFAULT_STOPS = ["134N", "134S", "A33N", "A33S"];
@@ -546,15 +697,77 @@
     setInterval(updateClock, 1000);
     updateClock();
 
+    // Load all available stations from API
+    async function loadAllStations() {
+      if (ALL_STATIONS.length > 0) return; // Already loaded
+
+      try {
+        const res = await fetch("/api/debug/stops");
+        const data = await res.json();
+
+        // Load stop names mapping
+        const stopNamesRes = await fetch("/api/stop-names");
+        const stopNames = await stopNamesRes.json();
+
+        // Group stops by base station (remove N/S/E/W suffix)
+        const stationMap = {};
+        data.stops.forEach(stop => {
+          const baseId = stop.stopId.replace(/[NSEW]$/, '');
+
+          // Try to find the station name - check with and without direction suffix
+          let stationName = stopNames[stop.stopId] || stopNames[baseId] || stop.stationName;
+
+          // If still no name, check if it matches any popular station
+          if (!stationName || stationName === stop.stopId) {
+            const popularMatch = POPULAR_STATIONS.find(ps => ps.stops.includes(stop.stopId));
+            if (popularMatch) {
+              stationName = popularMatch.name;
+            } else {
+              stationName = stop.stopId; // Fallback to ID
+            }
+          }
+
+          if (!stationMap[baseId]) {
+            stationMap[baseId] = {
+              name: stationName,
+              stops: [],
+              lines: new Set()
+            };
+          }
+          stationMap[baseId].stops.push(stop.stopId);
+          stop.routes.forEach(route => stationMap[baseId].lines.add(route));
+        });
+
+        // Convert to array format
+        ALL_STATIONS = Object.entries(stationMap).map(([baseId, info]) => ({
+          name: info.name,
+          stops: info.stops.sort(),
+          lines: Array.from(info.lines).sort().join(',')
+        })).sort((a, b) => a.name.localeCompare(b.name));
+
+        console.log(`Loaded ${ALL_STATIONS.length} stations from API`);
+      } catch (err) {
+        console.error("Error loading all stations:", err);
+      }
+    }
+
     // Modal functions
-    function openSettings() {
+    async function openSettings() {
       // Hide welcome screen if it's open
       document.getElementById("welcomeScreen").classList.remove("active");
       markAsVisited();
 
+      // Load all stations if not already loaded
+      await loadAllStations();
+
       // Load and display station list
       renderStationList();
       document.getElementById("modalOverlay").classList.add("active");
+
+      // Setup search functionality
+      const searchInput = document.getElementById("stationSearch");
+      searchInput.value = ""; // Clear search
+      searchInput.addEventListener("input", handleSearch);
     }
 
     function closeSettings() {
@@ -567,11 +780,40 @@
       }
     }
 
-    function renderStationList() {
+    function handleSearch(e) {
+      const query = e.target.value.toLowerCase().trim();
+      renderStationList(query);
+    }
+
+    function renderStationList(searchQuery = "") {
       const container = document.getElementById("stationList");
       const selectedStops = getSelectedStops();
 
-      container.innerHTML = POPULAR_STATIONS.map((station, index) => {
+      let stationsToShow = [];
+
+      if (searchQuery) {
+        // Search through all stations
+        stationsToShow = ALL_STATIONS.filter(station => {
+          const nameMatch = station.name.toLowerCase().includes(searchQuery);
+          const linesMatch = station.lines.toLowerCase().includes(searchQuery);
+          const stopsMatch = station.stops.some(stop => stop.toLowerCase().includes(searchQuery));
+          return nameMatch || linesMatch || stopsMatch;
+        });
+      }
+
+      if (searchQuery && stationsToShow.length === 0) {
+        container.innerHTML = '<div class="empty-state">No stations found</div>';
+        return;
+      }
+
+      if (!searchQuery) {
+        container.innerHTML = '<div class="empty-state">Start typing to search for stations...</div>';
+        return;
+      }
+
+      const sectionHeader = `<div class="section-header">Search Results (${stationsToShow.length})</div>`;
+
+      const stationItems = stationsToShow.map((station, index) => {
         const isSelected = station.stops.some(stop => selectedStops.includes(stop));
 
         return `
@@ -584,6 +826,8 @@
           </div>
         `;
       }).join("");
+
+      container.innerHTML = sectionHeader + stationItems;
     }
 
     function toggleStation(element) {
