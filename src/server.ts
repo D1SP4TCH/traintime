@@ -11,15 +11,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // MTA GTFS-Realtime feed URLs
-// Different lines use different endpoints:
-// - A, C, E: https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace
-// - 1, 2, 3: https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs
+// Different lines use different endpoints
 // Set MTA_FEED_URLS as comma-separated list, or use defaults
-const MTA_FEED_URLS = process.env.MTA_FEED_URLS 
+const MTA_FEED_URLS = process.env.MTA_FEED_URLS
   ? process.env.MTA_FEED_URLS.split(",")
   : [
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace", // A, C, E
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs",     // 1, 2, 3
+      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace",   // A, C, E
+      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs",       // 1, 2, 3, 4, 5, 6, 7
+      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm",  // B, D, F, M
+      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-nqrw",  // N, Q, R, W
+      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-jz",    // J, Z
+      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-g",     // G
+      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-l",     // L
+      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-si",    // SIR (Staten Island Railway)
     ];
 
 // MTA API key (get from https://api.mta.info/)
@@ -191,7 +195,7 @@ app.get("/health", (req, res) => {
 // Debug endpoint to see available stops
 app.get("/api/debug/stops", (req, res) => {
   const stopMap: Record<string, { routes: Set<string>, count: number }> = {};
-  
+
   cachedDepartures.forEach(dep => {
     if (!stopMap[dep.stopId]) {
       stopMap[dep.stopId] = { routes: new Set(), count: 0 };
@@ -210,6 +214,11 @@ app.get("/api/debug/stops", (req, res) => {
     .sort((a, b) => a.stopId.localeCompare(b.stopId));
 
   res.json({ stops, total: stops.length });
+});
+
+// API endpoint to get stop names mapping
+app.get("/api/stop-names", (req, res) => {
+  res.json(STOP_NAME_MAP);
 });
 
 // Serve static frontend from /public

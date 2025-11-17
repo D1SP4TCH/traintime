@@ -45,6 +45,30 @@
       font-variant-numeric: tabular-nums;
     }
 
+    .settings-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #f7f7f7;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      z-index: 100;
+    }
+
+    .settings-btn:hover {
+      background: rgba(255,255,255,0.2);
+      transform: rotate(30deg);
+    }
+
     .row {
       display: grid;
       grid-template-columns: 80px minmax(0, 1.4fr) 70px 60px;
@@ -63,6 +87,21 @@
       border-bottom-color: rgba(255,255,255,0.25);
       padding: 8px 12px;
       font-weight: 600;
+    }
+
+    .station-header {
+      padding: 16px 12px 8px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      margin-top: 12px;
+    }
+
+    .station-header:first-child {
+      margin-top: 0;
     }
 
     .row .route-pill {
@@ -112,6 +151,214 @@
       font-size: 14px;
     }
 
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      animation: fadeIn 0.2s;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal {
+      background: #0a0a1a;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: #f7f7f7;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .close-btn:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .station-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .station-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .station-item:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .station-item.selected {
+      background: rgba(66, 135, 245, 0.2);
+      border-color: rgba(66, 135, 245, 0.5);
+    }
+
+    .station-checkbox {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      cursor: pointer;
+      accent-color: #4287f5;
+    }
+
+    .station-info {
+      flex: 1;
+    }
+
+    .station-name {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .station-details {
+      font-size: 12px;
+      opacity: 0.6;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #4287f5;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #357ae8;
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      color: #f7f7f7;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    /* Welcome Screen */
+    .welcome-screen {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #020314;
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .welcome-screen.active {
+      display: flex;
+    }
+
+    .welcome-content {
+      max-width: 500px;
+      text-align: center;
+    }
+
+    .welcome-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: 0.05em;
+    }
+
+    .welcome-subtitle {
+      font-size: 16px;
+      opacity: 0.7;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .welcome-icon {
+      font-size: 64px;
+      margin-bottom: 24px;
+    }
+
     @media (max-width: 600px) {
       .row {
         grid-template-columns: 70px minmax(0, 1fr) 60px 50px;
@@ -121,10 +368,36 @@
       .board {
         padding: 12px;
       }
+      .settings-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+      }
+      .modal {
+        width: 95%;
+        max-height: 85vh;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Welcome Screen -->
+  <div class="welcome-screen" id="welcomeScreen">
+    <div class="welcome-content">
+      <div class="welcome-icon">🚇</div>
+      <h1 class="welcome-title">Welcome to MTA Departures</h1>
+      <p class="welcome-subtitle">
+        Track real-time subway arrivals across NYC.<br>
+        Let's set up your favorite stations to get started.
+      </p>
+      <button class="btn btn-primary" onclick="openSettings()">Choose Stations</button>
+    </div>
+  </div>
+
+  <!-- Settings Button -->
+  <button class="settings-btn" onclick="openSettings()" title="Settings">⚙️</button>
+
+  <!-- Main Board -->
   <div class="board">
     <div class="board-header">
       <div class="board-title">MTA Departures</div>
@@ -141,14 +414,86 @@
     <div id="rows"></div>
   </div>
 
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlayClick(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">Select Stations</div>
+        <button class="close-btn" onclick="closeSettings()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="station-list" id="stationList"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="resetToDefaults()">Reset to Defaults</button>
+        <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // Houston St - Line 1
-    // 134N = Houston St (Uptown/Northbound)
-    // 134S = Houston St (Downtown/Southbound)
-    // Spring St - ACE Line
-    // A33N = Spring St (Uptown/Northbound)
-    // A33S = Spring St (Downtown/Southbound)
-    const STOPS = ["134N", "134S", "A33N", "A33S"];
+    // Popular NYC Subway Stations (curated list)
+    const POPULAR_STATIONS = [
+      { name: "Times Square - 42nd St", stops: ["127N", "127S"], lines: "1,2,3,7,N,Q,R,W,S" },
+      { name: "Grand Central - 42nd St", stops: ["631N", "631S"], lines: "4,5,6,7" },
+      { name: "Union Square - 14th St", stops: ["R20N", "R20S"], lines: "4,5,6,L,N,Q,R,W" },
+      { name: "Herald Square - 34th St", stops: ["R16N", "R16S"], lines: "B,D,F,M,N,Q,R,W" },
+      { name: "Columbus Circle - 59th St", stops: ["A11N", "A11S"], lines: "A,C,B,D,1" },
+      { name: "Fulton St", stops: ["A38N", "A38S"], lines: "A,C,2,3,4,5,J,Z" },
+      { name: "Atlantic Ave - Barclays Ctr", stops: ["D24N", "D24S"], lines: "B,D,N,Q,R,2,3,4,5" },
+      { name: "Houston St", stops: ["134N", "134S"], lines: "1" },
+      { name: "Spring St", stops: ["A33N", "A33S"], lines: "A,C,E" },
+      { name: "Canal St", stops: ["A34N", "A34S"], lines: "A,C,E,N,Q,R,W,J,Z,6" },
+      { name: "14th St - Union Sq", stops: ["L15N", "L15S"], lines: "L,4,5,6,N,Q,R,W" },
+      { name: "Lexington Ave/53rd St", stops: ["D14N", "D14S"], lines: "E,M" },
+      { name: "42nd St - Port Authority", stops: ["A25N", "A25S"], lines: "A,C,E" },
+      { name: "Brooklyn Bridge - City Hall", stops: ["423N", "423S"], lines: "4,5,6" },
+      { name: "96th St", stops: ["120N", "120S"], lines: "1,2,3" },
+      { name: "125th St", stops: ["A12N", "A12S"], lines: "A,B,C,D" },
+      { name: "Rockefeller Center - 47-50 Sts", stops: ["D15N", "D15S"], lines: "B,D,F,M" },
+      { name: "West 4th St - Washington Sq", stops: ["A32N", "A32S"], lines: "A,C,E,B,D,F,M" },
+      { name: "Chambers St", stops: ["A36N", "A36S"], lines: "A,C,1,2,3" },
+      { name: "Jay St - MetroTech", stops: ["A41N", "A41S"], lines: "A,C,F,R" },
+      { name: "Court Sq", stops: ["G21N", "G21S"], lines: "E,M,G,7" },
+      { name: "Jackson Heights - Roosevelt Ave", stops: ["E06N", "E06S"], lines: "E,F,M,R,7" },
+      { name: "Astoria Blvd", stops: ["R09N", "R09S"], lines: "N,W" },
+    ];
+
+    // Default stations (Houston St + Spring St)
+    const DEFAULT_STOPS = ["134N", "134S", "A33N", "A33S"];
+
+    // Get selected stops from localStorage or use defaults
+    function getSelectedStops() {
+      const saved = localStorage.getItem("selectedStops");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error("Error parsing saved stops:", e);
+        }
+      }
+      return DEFAULT_STOPS;
+    }
+
+    // Save selected stops to localStorage
+    function saveSelectedStops(stops) {
+      localStorage.setItem("selectedStops", JSON.stringify(stops));
+    }
+
+    // Check if this is first visit
+    function isFirstVisit() {
+      return !localStorage.getItem("hasVisited");
+    }
+
+    // Mark as visited
+    function markAsVisited() {
+      localStorage.setItem("hasVisited", "true");
+    }
+
+    // Show welcome screen on first visit
+    if (isFirstVisit()) {
+      document.getElementById("welcomeScreen").classList.add("active");
+    }
 
     // MTA line colors
     function getRouteColor(route) {
@@ -201,12 +546,153 @@
     setInterval(updateClock, 1000);
     updateClock();
 
+    // Modal functions
+    function openSettings() {
+      // Hide welcome screen if it's open
+      document.getElementById("welcomeScreen").classList.remove("active");
+      markAsVisited();
+
+      // Load and display station list
+      renderStationList();
+      document.getElementById("modalOverlay").classList.add("active");
+    }
+
+    function closeSettings() {
+      document.getElementById("modalOverlay").classList.remove("active");
+    }
+
+    function closeModalOnOverlayClick(event) {
+      if (event.target.id === "modalOverlay") {
+        closeSettings();
+      }
+    }
+
+    function renderStationList() {
+      const container = document.getElementById("stationList");
+      const selectedStops = getSelectedStops();
+
+      container.innerHTML = POPULAR_STATIONS.map((station, index) => {
+        const isSelected = station.stops.some(stop => selectedStops.includes(stop));
+
+        return `
+          <div class="station-item ${isSelected ? 'selected' : ''}" data-stops='${JSON.stringify(station.stops)}' onclick="toggleStation(this)">
+            <input type="checkbox" class="station-checkbox" ${isSelected ? 'checked' : ''}>
+            <div class="station-info">
+              <div class="station-name">${station.name}</div>
+              <div class="station-details">Lines: ${station.lines}</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function toggleStation(element) {
+      const checkbox = element.querySelector(".station-checkbox");
+      checkbox.checked = !checkbox.checked;
+      element.classList.toggle("selected");
+    }
+
+    function saveSettings() {
+      const selectedStops = [];
+      document.querySelectorAll(".station-item").forEach(item => {
+        const checkbox = item.querySelector(".station-checkbox");
+        if (checkbox.checked) {
+          // Extract stops from data-stops attribute
+          const stopsData = item.getAttribute("data-stops");
+          if (stopsData) {
+            const stops = JSON.parse(stopsData);
+            selectedStops.push(...stops);
+          }
+        }
+      });
+
+      console.log("Selected stops:", selectedStops);
+
+      if (selectedStops.length === 0) {
+        alert("Please select at least one station");
+        return;
+      }
+
+      saveSelectedStops(selectedStops);
+      closeSettings();
+
+      // Force a complete refresh
+      setTimeout(() => {
+        fetchDepartures();
+      }, 100);
+    }
+
+    function resetToDefaults() {
+      saveSelectedStops(DEFAULT_STOPS);
+      renderStationList();
+    }
+
+    // Stop names cache
+    let stopNamesCache = null;
+
+    // Load stop names from the server
+    async function loadStopNames() {
+      if (stopNamesCache) return stopNamesCache;
+      try {
+        const res = await fetch('/api/stop-names');
+        stopNamesCache = await res.json();
+        return stopNamesCache;
+      } catch (err) {
+        console.error("Error loading stop names:", err);
+        return {};
+      }
+    }
+
+    // Get station name from stop ID
+    function getStationName(stopId) {
+      for (const station of POPULAR_STATIONS) {
+        if (station.stops.includes(stopId)) {
+          return station.name;
+        }
+      }
+      return "Unknown Station";
+    }
+
+    // Get destination name from stop ID
+    function getDestinationName(stopId, direction) {
+      if (!stopNamesCache) {
+        // Fallback to direction if no cache
+        return direction === "N" ? "Uptown" :
+               direction === "S" ? "Downtown" :
+               direction === "E" ? "Eastbound" :
+               direction === "W" ? "Westbound" : direction;
+      }
+
+      // Try with and without direction suffix
+      let name = stopNamesCache[stopId] || stopNamesCache[stopId.replace(/[NSEW]$/, '')];
+
+      if (name) {
+        return name;
+      }
+
+      // Fallback to direction label
+      return direction === "N" ? "Uptown" :
+             direction === "S" ? "Downtown" :
+             direction === "E" ? "Eastbound" :
+             direction === "W" ? "Westbound" : direction;
+    }
+
     async function fetchDepartures() {
       try {
+        // Load stop names if not loaded
+        await loadStopNames();
+
+        const STOPS = getSelectedStops();
+
+        if (STOPS.length === 0) {
+          document.getElementById("rows").innerHTML = '<div class="empty-state">No stations selected. Click the settings button to choose stations.</div>';
+          return;
+        }
+
         const res = await fetch("/api/departures?stops=" + STOPS.join(","));
         const data = await res.json();
         const rowsEl = document.getElementById("rows");
-        
+
         if (!rowsEl) return;
 
         if (!data.departures || data.departures.length === 0) {
@@ -218,72 +704,83 @@
 
         const now = Date.now();
 
-        // Helper function to get the appropriate train based on run time threshold
-        // If closest train is >= threshold minutes away, show it. Otherwise show next train.
-        function getTrainForDirection(departures, stopId, direction, thresholdMinutes) {
-          const filtered = departures
-            .filter(dep => dep.stopId === stopId && dep.direction === direction)
-            .sort((a, b) => a.time - b.time);
-          
-          if (filtered.length === 0) return undefined;
-          
-          const closest = filtered[0];
-          const mins = Math.max(0, Math.round((closest.time - now) / 60000));
-          
-          // If closest train is >= threshold minutes away, show it
-          if (mins >= thresholdMinutes) {
-            return closest;
+        // Group departures by station
+        const stationGroups = {};
+        STOPS.forEach(stopId => {
+          const baseStopId = stopId.substring(0, stopId.length - 1); // Remove N/S
+          if (!stationGroups[baseStopId]) {
+            stationGroups[baseStopId] = {
+              name: getStationName(stopId),
+              stops: [],
+              departures: []
+            };
           }
-          
-          // Otherwise, show the next train (second closest)
-          return filtered.length > 1 ? filtered[1] : closest;
-        }
+          if (!stationGroups[baseStopId].stops.includes(stopId)) {
+            stationGroups[baseStopId].stops.push(stopId);
+          }
+        });
 
-        // 1 train: 3 minute threshold
-        // 134N (uptown), 134S (downtown)
-        const oneUptown = getTrainForDirection(data.departures, "134N", "N", 3);
-        const oneDowntown = getTrainForDirection(data.departures, "134S", "S", 3);
-        
-        // ACE train: 5 minute threshold
-        // A33N (uptown), A33S (downtown)
-        const aceUptown = getTrainForDirection(data.departures, "A33N", "N", 5);
-        const aceDowntown = getTrainForDirection(data.departures, "A33S", "S", 5);
-        
-        const closestTrains = [oneUptown, oneDowntown, aceUptown, aceDowntown]
-          .filter(dep => dep !== undefined);
+        // Get upcoming departures for each direction
+        data.departures.forEach(dep => {
+          const baseStopId = dep.stopId.substring(0, dep.stopId.length - 1);
+          if (stationGroups[baseStopId]) {
+            stationGroups[baseStopId].departures.push(dep);
+          }
+        });
 
-        closestTrains.forEach(dep => {
-          const row = document.createElement("div");
-          row.className = "row";
+        // Render grouped by station
+        Object.values(stationGroups).forEach(station => {
+          if (station.departures.length === 0) return;
 
-          const mins = Math.max(0, Math.round((dep.time - now) / 60000));
-          const minsClass = mins <= 2 ? "soon" : "";
+          // Add station header
+          const header = document.createElement("div");
+          header.className = "station-header";
+          header.textContent = station.name;
+          rowsEl.appendChild(header);
 
-          // Determine direction from stop ID (N = Uptown, S = Downtown, E = Eastbound, W = Westbound)
-          const direction = dep.direction === "N" ? "Uptown" : 
-                           dep.direction === "S" ? "Downtown" :
-                           dep.direction === "E" ? "Eastbound" :
-                           dep.direction === "W" ? "Westbound" : dep.direction;
-          
-          // Determine line name from stop ID
-          const lineName = dep.stopId.startsWith("134") ? "1 Train" : "ACE";
-          
-          // Use destination (final stop) if available, otherwise fall back to station name
-          const destination = dep.destination || dep.stationName || "Unknown";
-          const displayName = `${lineName} - ${destination} (${direction})`;
+          // Get the closest train per route per direction (e.g., "1-N", "2-S", "A-N", etc.)
+          const routeDirections = {};
+          station.departures
+            .sort((a, b) => a.time - b.time)
+            .forEach(dep => {
+              const key = `${dep.route}-${dep.direction}`; // Combine route and direction
+              if (!routeDirections[key]) {
+                routeDirections[key] = dep; // Only keep the first (closest) one per route-direction combo
+              }
+            });
 
-          // Get route colors
-          const routeColor = getRouteColor(dep.route);
-          const routeTextColor = getRouteTextColor(dep.route);
+          // Convert to array and sort by time
+          const selectedTrains = Object.values(routeDirections)
+            .sort((a, b) => a.time - b.time);
 
-          row.innerHTML = `
-            <div class="time">${formatTime(dep.time)}</div>
-            <div class="station">${displayName}</div>
-            <div><span class="route-pill" style="background: ${routeColor}; color: ${routeTextColor};">${dep.route}</span></div>
-            <div class="mins ${minsClass}">${mins}</div>
-          `;
+          selectedTrains.forEach(dep => {
+            const row = document.createElement("div");
+            row.className = "row";
 
-          rowsEl.appendChild(row);
+            const mins = Math.max(0, Math.round((dep.time - now) / 60000));
+            const minsClass = mins <= 2 ? "soon" : "";
+
+            // Get destination name from stop ID (with fallback to direction)
+            const destinationName = dep.destination ?
+              getDestinationName(dep.destination, dep.direction) :
+              (dep.direction === "N" ? "Uptown" :
+               dep.direction === "S" ? "Downtown" :
+               dep.direction === "E" ? "Eastbound" :
+               dep.direction === "W" ? "Westbound" : dep.direction);
+
+            // Get route colors
+            const routeColor = getRouteColor(dep.route);
+            const routeTextColor = getRouteTextColor(dep.route);
+
+            row.innerHTML = `
+              <div class="time">${formatTime(dep.time)}</div>
+              <div class="station">${destinationName}</div>
+              <div><span class="route-pill" style="background: ${routeColor}; color: ${routeTextColor};">${dep.route}</span></div>
+              <div class="mins ${minsClass}">${mins}</div>
+            `;
+
+            rowsEl.appendChild(row);
+          });
         });
       } catch (err) {
         console.error("Error fetching departures:", err);
@@ -301,4 +798,3 @@
   </script>
 </body>
 </html>
-
