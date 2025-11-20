@@ -10,21 +10,34 @@ const fetch = require("node-fetch");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// MTA GTFS-Realtime feed URLs
-// Different lines use different endpoints
-// Set MTA_FEED_URLS as comma-separated list, or use defaults
-const MTA_FEED_URLS = process.env.MTA_FEED_URLS
+// MTA feed mapping - maps routes to their feed URLs
+const FEED_MAP: Record<string, string> = {
+  "ace": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace",   // A, C, E
+  "123456S": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs",   // 1, 2, 3, 4, 5, 6, 7, S
+  "bdfm": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm", // B, D, F, M
+  "nqrw": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-nqrw", // N, Q, R, W
+  "jz": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-jz",     // J, Z
+  "g": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-g",       // G
+  "l": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-l",       // L
+  "si": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-si",     // SIR
+};
+
+// Map individual routes to feed keys
+const ROUTE_TO_FEED: Record<string, string> = {
+  "A": "ace", "C": "ace", "E": "ace",
+  "1": "123456S", "2": "123456S", "3": "123456S", "4": "123456S", "5": "123456S", "6": "123456S", "7": "123456S", "S": "123456S",
+  "B": "bdfm", "D": "bdfm", "F": "bdfm", "M": "bdfm",
+  "N": "nqrw", "Q": "nqrw", "R": "nqrw", "W": "nqrw",
+  "J": "jz", "Z": "jz",
+  "G": "g",
+  "L": "l",
+  "SI": "si",
+};
+
+// Active feeds to fetch (can be updated via API)
+let activeFeedUrls = process.env.MTA_FEED_URLS
   ? process.env.MTA_FEED_URLS.split(",")
-  : [
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace",   // A, C, E
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs",       // 1, 2, 3, 4, 5, 6, 7
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm",  // B, D, F, M
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-nqrw",  // N, Q, R, W
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-jz",    // J, Z
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-g",     // G
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-l",     // L
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-si",    // SIR (Staten Island Railway)
-    ];
+  : Object.values(FEED_MAP); // Default to all feeds
 
 // MTA API key (get from https://api.mta.info/)
 const MTA_API_KEY = process.env.MTA_API_KEY || "";
@@ -73,9 +86,9 @@ let learnedStationNames: Record<string, string> = {};
 
 async function fetchSubwayFeed(): Promise<void> {
   const allDepartures: Departure[] = [];
-  
-  // Fetch from all configured feeds
-  for (const feedUrl of MTA_FEED_URLS) {
+
+  // Fetch from all active feeds
+  for (const feedUrl of activeFeedUrls) {
     try {
       const headers: Record<string, string> = {
         "Content-Type": "application/x-protobuf",
@@ -232,13 +245,52 @@ app.get("/api/stop-names", (req, res) => {
   res.json(STOP_NAME_MAP);
 });
 
+// API endpoint to update active feeds based on routes
+app.post("/api/configure-feeds", express.json(), (req, res) => {
+  const { routes } = req.body as { routes?: string[] };
+
+  if (!routes || !Array.isArray(routes)) {
+    return res.status(400).json({ error: "routes array is required" });
+  }
+
+  // Determine which feeds are needed for the requested routes
+  const feedKeys = new Set<string>();
+  routes.forEach(route => {
+    const feedKey = ROUTE_TO_FEED[route.toUpperCase()];
+    if (feedKey) {
+      feedKeys.add(feedKey);
+    }
+  });
+
+  // Update active feeds
+  const newFeeds = Array.from(feedKeys).map(key => FEED_MAP[key]).filter(Boolean);
+
+  if (newFeeds.length === 0) {
+    return res.status(400).json({ error: "No valid routes provided" });
+  }
+
+  activeFeedUrls = newFeeds;
+  console.log(`Updated active feeds to ${newFeeds.length} feed(s) for routes: ${routes.join(", ")}`);
+
+  // Clear cache and re-fetch immediately with new feeds
+  cachedDepartures = [];
+  fetchSubwayFeed();
+
+  res.json({
+    success: true,
+    routes,
+    activeFeeds: newFeeds.length,
+    feeds: newFeeds
+  });
+});
+
 // Serve static frontend from /public
 app.use(express.static("public"));
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`MTA API Key: ${MTA_API_KEY ? "Set" : "Not set (may be required)"}`);
-  console.log(`Fetching from ${MTA_FEED_URLS.length} feed(s):`);
-  MTA_FEED_URLS.forEach((url, i) => console.log(`  ${i + 1}. ${url}`));
+  console.log(`Fetching from ${activeFeedUrls.length} feed(s):`);
+  activeFeedUrls.forEach((url: string, i: number) => console.log(`  ${i + 1}. ${url}`));
 });
 

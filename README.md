@@ -4,75 +4,104 @@ A real-time subway departure board designed for tablet display. Polls MTA GTFS-R
 
 ## Features
 
-- Real-time MTA subway departure information
+- Real-time MTA subway departure information across all lines
 - Clean, tablet-optimized UI
-- Auto-refreshing every 15-30 seconds
-- Filter by specific stations and directions
+- Auto-refreshing every 15 seconds
+- Multi-station selection with search
+- Interactive station picker UI
 - Automatic station name mapping from GTFS static data
+- Groups departures by station for easy viewing
+- **Smart feed optimization** - automatically fetches only the subway lines you're tracking
 
 ## Setup
 
 ### Prerequisites
 
 - Node.js 18+ and npm
-- MTA API key (get from [MTA Developer Resources](https://api.mta.info/))
 
-### Installation
+### Quick Start
 
 1. Clone or download this repository
+
 2. Install dependencies:
    ```bash
    npm install
    ```
 
-3. Set up environment variables:
+3. Start the development server:
    ```bash
-   cp .env.example .env
+   npm run dev
    ```
-   Then edit `.env` and add your MTA API key.
 
-4. **Get Station Names (Important!)**:
-   
-   The app needs to map stop IDs (like "104N") to station names (like "Times Square"). You have two options:
-   
-   **Option A: Download GTFS Static Data (Recommended)**
-   ```bash
-   # 1. Download MTA GTFS static data from:
-   #    https://new.mta.info/developers
-   #    Look for "GTFS Schedule Data" and download the zip file
-   
-   # 2. Extract stops.txt from the zip
-   
-   # 3. Parse it to generate stop names:
-   node scripts/parse-stops.js <path-to-stops.txt> > data/stop-names.json
-   
-   # 4. Restart the server - it will automatically load the names!
-   ```
-   
-   **Option B: Manual Mapping**
-   - Edit `src/server.ts` and add entries to `MANUAL_STOP_NAMES`
-   - Or use the stops browser at `http://localhost:3000/stops.html` to see stop IDs, then add them manually
+4. Open `http://localhost:3000` in your browser
 
-5. Configure your stations:
-   - Edit `public/index.html` and update the `STOPS` array in the JavaScript
-   - Station names will automatically appear if you've loaded the GTFS data!
+5. On first visit, you'll see a welcome screen - click "Choose Stations" to select your stations
 
-### Finding Station Stop IDs
+That's it! The app comes pre-configured with station names and popular stations. The MTA API is public and doesn't require an API key for basic use.
 
-Stop IDs vary by line:
-- **Numeric lines (1, 2, 3, etc.)**: Use numeric IDs like `104N`, `104S`
-- **Letter lines (A, C, E, etc.)**: Use letter-number combinations like `A33N`, `A41S`
+### Station Selection
 
-**Easy way to find your stops:**
+The app includes a built-in station picker:
+- Click the settings (⚙️) button to open station selection
+- Browse popular stations or use the search box
+- Select multiple stations by clicking them
+- Click "Save" to update your departure board
+
+Station selections are saved in your browser's local storage.
+
+**Performance Note**: When you save your station selections, the app automatically configures the server to only fetch MTA feeds for the subway lines you're tracking. For example, if you only select stations on the 1 and A lines, the server will only fetch 2 feeds instead of all 8, reducing bandwidth usage by 75%!
+
+## Advanced Configuration
+
+### MTA API Key (Optional)
+
+The MTA API is public and works without an API key. However, if you have rate limiting issues or want to use an API key, you can set it via environment variable:
+
+```bash
+MTA_API_KEY=your_api_key_here
+```
+
+Get your API key from [MTA Developer Resources](https://api.mta.info/) if needed.
+
+### How Feed Optimization Works
+
+The app intelligently manages which MTA feeds to fetch:
+
+**Automatic Mode** (Recommended):
+- When you select stations in the UI, the app automatically determines which subway lines you need
+- The server then only fetches feeds for those specific lines
+- This happens transparently - no configuration needed!
+
+**Manual Override** (Optional):
+If you want to manually control which feeds are fetched regardless of station selection, set the `MTA_FEED_URLS` environment variable:
+
+```bash
+# Only fetch A/C/E and 1/2/3/4/5/6/7 lines
+MTA_FEED_URLS=https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace,https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs
+```
+
+**Available Feed URLs:**
+- **A, C, E**: `https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace`
+- **1, 2, 3, 4, 5, 6, 7**: `https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs`
+- **B, D, F, M**: `https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm`
+- **N, Q, R, W**: `https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-nqrw`
+- **J, Z**: `https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-jz`
+- **G**: `https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-g`
+- **L**: `https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-l`
+- **SIR**: `https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-si`
+
+More feeds available at [MTA Developer Resources](https://api.mta.info/).
+
+### Viewing Available Stops
+
+To see all available stops and their IDs:
 1. Start the server: `npm run dev`
-2. Visit `http://localhost:3000/stops.html` to see all available stops
-3. Or use the API: `curl http://localhost:3000/api/debug/stops`
+2. Visit `http://localhost:3000/api/debug/stops` to see a JSON list of all stops
+3. Or use the built-in station picker in the UI (click the ⚙️ button)
 
-**Note:** Different subway lines require different feed URLs. The default feeds include:
-- A, C, E lines
-- 1, 2, 3 lines
-
-For other lines (like R, N, Q, etc.), you'll need to add their feed URLs to `MTA_FEED_URLS`. Check [MTA Developer Resources](https://api.mta.info/) for all available feeds.
+Stop ID format:
+- **Numeric lines (1, 2, 3, etc.)**: `104N`, `104S` (N=Northbound, S=Southbound)
+- **Letter lines (A, C, E, etc.)**: `A33N`, `A41S`
 
 ## Running Locally
 
@@ -97,17 +126,19 @@ Deploy to Render, Railway, Fly.io, or Heroku:
 
 1. Push to GitHub
 2. Create a new service/web app
-3. Set environment variables:
-   - `MTA_API_KEY` - Your MTA API key
-   - `PORT` - (optional) Server port
-4. Deploy
+3. Set build command: `npm run build`
+4. Set start command: `npm start`
+5. (Optional) Set environment variables:
+   - `MTA_API_KEY` - MTA API key (not required)
+   - `PORT` - Server port (usually auto-detected)
+6. Deploy
 
 ### Option 2: Raspberry Pi / Local Network
 
 1. Install Node.js on your Pi
-2. Clone this repo
-3. Set up environment variables
-4. Run `npm run build && npm start`
+2. Clone this repo and install dependencies: `npm install`
+3. Build the project: `npm run build`
+4. Start the server: `npm start`
 5. Access from tablet at `http://your-pi-ip:3000`
 
 ## Using on a Tablet
@@ -120,44 +151,58 @@ Deploy to Render, Railway, Fly.io, or Heroku:
 
 ## API Endpoints
 
-- `GET /` - Frontend departure board
-- `GET /api/departures?stops=R16N,R16S` - JSON API for departures
-- `GET /api/debug/stops` - List all available stops with routes
+- `GET /` - Frontend departure board UI
+- `GET /api/departures?stops=126N,126S` - Get departures for specific stops (JSON)
+- `GET /api/debug/stops` - List all available stops with routes (JSON)
+- `GET /api/stop-names` - Get station name mappings (JSON)
+- `POST /api/configure-feeds` - Configure which subway line feeds to fetch (JSON body: `{"routes": ["1", "A"]}`)
 - `GET /health` - Health check endpoint
-- `GET /stops.html` - Browse available stops in a web interface
 
-## Configuration
+## Developer Information
 
-### MTA Feed URLs
+### Station Name Data
 
-The MTA provides multiple GTFS-Realtime feeds for different subway lines. The app defaults to fetching from two feeds:
-- `https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace` - A, C, E lines
-- `https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs` - 1, 2, 3 lines
+Station names are pre-loaded from `data/stop-names.json`. This file is included in the repository and contains mappings from stop IDs to station names.
 
-To customize feeds, set `MTA_FEED_URLS` environment variable as a comma-separated list:
-```bash
-MTA_FEED_URLS=https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace,https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs
-```
-
-Additional feeds are available on [MTA Developer Resources](https://api.mta.info/).
-
-### Station Name Mapping
-
-Station names are loaded from `data/stop-names.json` if it exists. To generate this file:
-
-1. Download MTA GTFS static data from [MTA Developer Resources](https://new.mta.info/developers)
+To regenerate this file (if needed):
+1. Download GTFS static data from [MTA Developer Resources](https://new.mta.info/developers)
 2. Extract `stops.txt` from the zip file
 3. Run: `node scripts/parse-stops.js <path-to-stops.txt> > data/stop-names.json`
 4. Restart the server
 
-The server will automatically load station names on startup. If a stop ID isn't in the mapping, it will display the stop ID itself.
+### Project Structure
+
+```
+traintime/
+├── src/
+│   └── server.ts          # Express server & MTA API integration
+├── public/
+│   └── index.html         # Frontend UI with station picker
+├── data/
+│   └── stop-names.json    # Station name mappings
+├── scripts/
+│   └── parse-stops.js     # GTFS data parser
+└── dist/                  # Compiled TypeScript output
+```
 
 ## Troubleshooting
 
-- **No departures showing**: Check that your stop IDs are correct and the MTA API key is valid
-- **Feed errors**: Verify the MTA feed URL is correct and accessible
-- **No station names**: Make sure you've generated `data/stop-names.json` from GTFS static data
-- **CORS issues**: The frontend and backend should be on the same origin (or configure CORS)
+- **No departures showing**:
+  - Make sure you've selected stations using the settings (⚙️) button
+  - Check that the MTA feeds are accessible (the API doesn't require authentication)
+  - Check browser console for any errors
+
+- **Station names showing as IDs**:
+  - The `data/stop-names.json` file should be included in the repo
+  - If missing, see "Developer Information" section to regenerate it
+
+- **Can't select stations**:
+  - Try clearing the search box - stations should appear
+  - Check browser console for JavaScript errors
+
+- **Feed errors**:
+  - MTA feeds occasionally have outages - check [MTA Status](https://www.mta.info/)
+  - Try again in a few minutes
 
 ## License
 
