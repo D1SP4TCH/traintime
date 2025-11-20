@@ -760,14 +760,15 @@
       // Load all stations if not already loaded
       await loadAllStations();
 
-      // Load and display station list
-      renderStationList();
-      document.getElementById("modalOverlay").classList.add("active");
-
       // Setup search functionality
       const searchInput = document.getElementById("stationSearch");
       searchInput.value = ""; // Clear search
+      searchInput.removeEventListener("input", handleSearch);
       searchInput.addEventListener("input", handleSearch);
+
+      // Load and display station list
+      renderStationList();
+      document.getElementById("modalOverlay").classList.add("active");
     }
 
     function closeSettings() {
@@ -790,6 +791,7 @@
       const selectedStops = getSelectedStops();
 
       let stationsToShow = [];
+      let sectionHeader = "";
 
       if (searchQuery) {
         // Search through all stations
@@ -799,19 +801,64 @@
           const stopsMatch = station.stops.some(stop => stop.toLowerCase().includes(searchQuery));
           return nameMatch || linesMatch || stopsMatch;
         });
-      }
 
-      if (searchQuery && stationsToShow.length === 0) {
-        container.innerHTML = '<div class="empty-state">No stations found</div>';
+        if (stationsToShow.length === 0) {
+          container.innerHTML = '<div class="empty-state">No stations found</div>';
+          return;
+        }
+
+        sectionHeader = `<div class="section-header">Search Results (${stationsToShow.length})</div>`;
+      } else {
+        // Show currently selected stations and popular stations when no search query
+        const selectedStations = ALL_STATIONS.filter(station =>
+          station.stops.some(stop => selectedStops.includes(stop))
+        );
+
+        const popularStations = POPULAR_STATIONS.filter(station =>
+          !station.stops.some(stop => selectedStops.includes(stop))
+        );
+
+        let htmlContent = "";
+
+        if (selectedStations.length > 0) {
+          const selectedItems = selectedStations.map(station => {
+            return `
+              <div class="station-item selected" data-stops='${JSON.stringify(station.stops)}' onclick="toggleStation(this)">
+                <input type="checkbox" class="station-checkbox" checked>
+                <div class="station-info">
+                  <div class="station-name">${station.name}</div>
+                  <div class="station-details">Lines: ${station.lines}</div>
+                </div>
+              </div>
+            `;
+          }).join("");
+
+          htmlContent += `<div class="section-header">Selected Stations (${selectedStations.length})</div>` + selectedItems;
+        }
+
+        if (popularStations.length > 0) {
+          const popularItems = popularStations.map(station => {
+            return `
+              <div class="station-item" data-stops='${JSON.stringify(station.stops)}' onclick="toggleStation(this)">
+                <input type="checkbox" class="station-checkbox">
+                <div class="station-info">
+                  <div class="station-name">${station.name}</div>
+                  <div class="station-details">Lines: ${station.lines}</div>
+                </div>
+              </div>
+            `;
+          }).join("");
+
+          htmlContent += `<div class="section-header">Popular Stations</div>` + popularItems;
+        }
+
+        if (selectedStations.length === 0 && popularStations.length === 0) {
+          htmlContent = '<div class="empty-state">No stations available. Try searching for a station.</div>';
+        }
+
+        container.innerHTML = htmlContent;
         return;
       }
-
-      if (!searchQuery) {
-        container.innerHTML = '<div class="empty-state">Start typing to search for stations...</div>';
-        return;
-      }
-
-      const sectionHeader = `<div class="section-header">Search Results (${stationsToShow.length})</div>`;
 
       const stationItems = stationsToShow.map((station, index) => {
         const isSelected = station.stops.some(stop => selectedStops.includes(stop));
@@ -868,6 +915,8 @@
 
     function resetToDefaults() {
       saveSelectedStops(DEFAULT_STOPS);
+      const searchInput = document.getElementById("stationSearch");
+      searchInput.value = ""; // Clear search
       renderStationList();
     }
 
