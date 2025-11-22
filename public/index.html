@@ -20,29 +20,35 @@
     .board {
       max-width: 800px;
       margin: 0 auto;
-      padding: 16px;
+      padding: 12px;
     }
 
     .board-header {
       display: flex;
-      justify-content: space-between;
-      align-items: baseline;
+      justify-content: center;
+      align-items: center;
       margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid rgba(255,255,255,0.2);
+      padding: 16px 0;
     }
 
     .board-title {
       font-weight: 600;
       letter-spacing: 0.12em;
-      font-size: 16px;
+      font-size: 18px;
       text-transform: uppercase;
     }
 
     .board-clock {
-      font-size: 14px;
-      opacity: 0.7;
+      font-size: 28px;
+      font-weight: 600;
       font-variant-numeric: tabular-nums;
+      color: #f7f7f7;
+      letter-spacing: 0.05em;
+      padding: 12px 24px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
     }
 
     .settings-btn {
@@ -71,33 +77,33 @@
 
     .row {
       display: grid;
-      grid-template-columns: 80px minmax(0, 1.4fr) 70px 60px;
-      gap: 12px;
-      padding: 10px 12px;
-      font-size: 14px;
+      grid-template-columns: minmax(0, 1.4fr) 65px 55px;
+      gap: 10px;
+      padding: 8px 10px;
+      font-size: 16px;
       border-bottom: 1px solid rgba(255,255,255,0.06);
       align-items: center;
     }
 
     .row.header {
-      font-size: 11px;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.12em;
       opacity: 0.7;
       border-bottom-color: rgba(255,255,255,0.25);
-      padding: 8px 12px;
+      padding: 6px 10px;
       font-weight: 600;
     }
 
     .station-header {
-      padding: 16px 12px 8px;
-      font-size: 13px;
+      padding: 10px 10px 6px;
+      font-size: 15px;
       font-weight: 600;
       opacity: 0.8;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       border-bottom: 1px solid rgba(255,255,255,0.15);
-      margin-top: 12px;
+      margin-top: 8px;
     }
 
     .station-header:first-child {
@@ -108,11 +114,11 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 32px;
-      height: 24px;
-      padding: 0 8px;
-      border-radius: 4px;
-      font-size: 12px;
+      min-width: 36px;
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 5px;
+      font-size: 14px;
       font-weight: 700;
     }
 
@@ -120,18 +126,18 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      font-size: 13px;
+      font-size: 15px;
     }
 
     .time {
       font-variant-numeric: tabular-nums;
-      font-size: 13px;
+      font-size: 15px;
     }
 
     .mins {
       font-variant-numeric: tabular-nums;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 17px;
       text-align: right;
     }
 
@@ -139,8 +145,12 @@
       color: #ffcc00;
     }
 
+    .mins.near-threshold {
+      color: #ff9500;
+    }
+
     .status {
-      font-size: 11px;
+      font-size: 13px;
       opacity: 0.8;
     }
 
@@ -148,7 +158,7 @@
       text-align: center;
       padding: 40px 20px;
       opacity: 0.5;
-      font-size: 14px;
+      font-size: 16px;
     }
 
     /* Modal Styles */
@@ -195,8 +205,12 @@
     }
 
     .modal-header {
-      padding: 20px 24px;
+      padding: 0;
       border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .modal-header-top {
+      padding: 20px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -206,6 +220,44 @@
       font-size: 18px;
       font-weight: 600;
       letter-spacing: 0.05em;
+    }
+
+    .modal-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .modal-tab {
+      flex: 1;
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      color: rgba(247,247,247,0.6);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+      font-family: inherit;
+    }
+
+    .modal-tab:hover {
+      color: rgba(247,247,247,0.8);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .modal-tab.active {
+      color: #4287f5;
+      border-bottom-color: #4287f5;
+      background: rgba(66, 135, 245, 0.05);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
     }
 
     .close-btn {
@@ -324,6 +376,112 @@
       margin-top: 0;
     }
 
+
+    .threshold-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .threshold-station-name {
+      font-size: 14px;
+      font-weight: 500;
+      flex: 1;
+    }
+
+    .threshold-input-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .threshold-input {
+      width: 60px;
+      padding: 6px 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      color: #f7f7f7;
+      font-size: 14px;
+      font-family: inherit;
+      text-align: center;
+    }
+
+    .threshold-input:focus {
+      outline: none;
+      border-color: #4287f5;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .threshold-label {
+      font-size: 12px;
+      opacity: 0.6;
+      white-space: nowrap;
+    }
+
+    .threshold-remove-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #f7f7f7;
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      margin-left: 8px;
+    }
+
+    .threshold-remove-btn:hover {
+      background: rgba(255,0,0,0.2);
+      border-color: rgba(255,0,0,0.4);
+    }
+
+    .add-threshold-btn {
+      width: 100%;
+      padding: 10px;
+      background: rgba(66, 135, 245, 0.1);
+      border: 1px dashed rgba(66, 135, 245, 0.4);
+      border-radius: 6px;
+      color: #4287f5;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+
+    .add-threshold-btn:hover {
+      background: rgba(66, 135, 245, 0.2);
+      border-color: rgba(66, 135, 245, 0.6);
+    }
+
+    .threshold-select {
+      flex: 1;
+      padding: 6px 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      color: #f7f7f7;
+      font-size: 14px;
+      font-family: inherit;
+      margin-right: 8px;
+    }
+
+    .threshold-select:focus {
+      outline: none;
+      border-color: #4287f5;
+      background: rgba(255,255,255,0.08);
+    }
+
     .modal-footer {
       padding: 16px 24px;
       border-top: 1px solid rgba(255,255,255,0.1);
@@ -405,22 +563,108 @@
     }
 
     @media (max-width: 600px) {
+      .board {
+        padding: 10px;
+      }
+      
+      .board-title {
+        font-size: 16px;
+      }
+      
+      .board-clock {
+        font-size: 22px;
+        padding: 10px 20px;
+      }
+      
       .row {
-        grid-template-columns: 70px minmax(0, 1fr) 60px 50px;
+        grid-template-columns: minmax(0, 1fr) 58px 48px;
         gap: 8px;
+        padding: 7px 8px;
+        font-size: 15px;
+      }
+      
+      .row.header {
+        font-size: 11px;
+        padding: 5px 8px;
+      }
+      
+      .row .station {
+        font-size: 14px;
+      }
+      
+      .time {
+        font-size: 14px;
+      }
+      
+      .mins {
+        font-size: 16px;
+      }
+      
+      .row .route-pill {
+        min-width: 32px;
+        height: 26px;
+        padding: 0 8px;
         font-size: 13px;
       }
-      .board {
-        padding: 12px;
+      
+      .station-header {
+        font-size: 14px;
+        padding: 8px 8px 5px;
       }
+      
       .settings-btn {
         width: 40px;
         height: 40px;
         font-size: 18px;
+        top: 12px;
+        right: 12px;
       }
+      
       .modal {
         width: 95%;
         max-height: 85vh;
+      }
+      
+      .modal-tab {
+        padding: 10px 16px;
+        font-size: 13px;
+      }
+    }
+    
+    @media (max-width: 400px) {
+      .row {
+        grid-template-columns: minmax(0, 1fr) 55px 45px;
+        gap: 6px;
+        padding: 6px 6px;
+        font-size: 14px;
+      }
+      
+      .row .station {
+        font-size: 13px;
+      }
+      
+      .time {
+        font-size: 13px;
+      }
+      
+      .mins {
+        font-size: 15px;
+      }
+      
+      .row .route-pill {
+        min-width: 30px;
+        height: 24px;
+        padding: 0 6px;
+        font-size: 12px;
+      }
+      
+      .board-title {
+        font-size: 14px;
+      }
+      
+      .board-clock {
+        font-size: 20px;
+        padding: 8px 16px;
       }
     }
   </style>
@@ -445,15 +689,7 @@
   <!-- Main Board -->
   <div class="board">
     <div class="board-header">
-      <div class="board-title">MTA Departures</div>
       <div class="board-clock" id="clock"></div>
-    </div>
-
-    <div class="row header">
-      <div>Time</div>
-      <div>Destination</div>
-      <div>Route</div>
-      <div>Min</div>
     </div>
 
     <div id="rows"></div>
@@ -463,19 +699,38 @@
   <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlayClick(event)">
     <div class="modal" onclick="event.stopPropagation()">
       <div class="modal-header">
-        <div class="modal-title">Select Stations</div>
-        <button class="close-btn" onclick="closeSettings()">&times;</button>
+        <div class="modal-header-top">
+          <div class="modal-title">Settings</div>
+          <button class="close-btn" onclick="closeSettings()">&times;</button>
+        </div>
+        <div class="modal-tabs">
+          <button class="modal-tab active" onclick="switchTab('stations')">Stations</button>
+          <button class="modal-tab" onclick="switchTab('thresholds')">Thresholds</button>
+        </div>
       </div>
       <div class="modal-body">
-        <div class="search-box">
-          <input
-            type="text"
-            class="search-input"
-            id="stationSearch"
-            placeholder="Search all stations..."
-          />
+        <!-- Stations Tab -->
+        <div class="tab-content active" id="stationsTab">
+          <div class="search-box">
+            <input
+              type="text"
+              class="search-input"
+              id="stationSearch"
+              placeholder="Search all stations..."
+            />
+          </div>
+          <div class="station-list" id="stationList"></div>
         </div>
-        <div class="station-list" id="stationList"></div>
+        
+        <!-- Thresholds Tab -->
+        <div class="tab-content" id="thresholdsTab">
+          <div class="section-header">Minimum Time Thresholds</div>
+          <div style="font-size: 12px; opacity: 0.7; margin-bottom: 12px; padding-left: 4px;">
+            Set minimum minutes for each station. Trains with less time won't be shown.
+          </div>
+          <div id="thresholdList"></div>
+          <button class="add-threshold-btn" onclick="addThresholdRow()">+ Add Threshold</button>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="resetToDefaults()">Reset to Defaults</button>
@@ -631,6 +886,24 @@
       localStorage.setItem("selectedStops", JSON.stringify(stops));
     }
 
+    // Get station thresholds from localStorage
+    function getStationThresholds() {
+      const saved = localStorage.getItem("stationThresholds");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error("Error parsing saved thresholds:", e);
+        }
+      }
+      return {};
+    }
+
+    // Save station thresholds to localStorage
+    function saveStationThresholds(thresholds) {
+      localStorage.setItem("stationThresholds", JSON.stringify(thresholds));
+    }
+
     // Check if this is first visit
     function isFirstVisit() {
       return !localStorage.getItem("hasVisited");
@@ -689,8 +962,7 @@
       if (clockEl) {
         clockEl.textContent = new Date().toLocaleTimeString([], {
           hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit"
+          minute: "2-digit"
         });
       }
     }
@@ -765,7 +1037,36 @@
 
       // Load and display station list (doesn't require API call)
       renderStationList();
+      renderThresholdList();
+      
+      // Switch to stations tab by default
+      switchTab('stations');
+      
       document.getElementById("modalOverlay").classList.add("active");
+    }
+
+    function switchTab(tabName) {
+      // Update tab buttons
+      const tabs = document.querySelectorAll('.modal-tab');
+      tabs.forEach((tab, index) => {
+        tab.classList.remove('active');
+        if ((tabName === 'stations' && index === 0) || (tabName === 'thresholds' && index === 1)) {
+          tab.classList.add('active');
+        }
+      });
+
+      // Update tab content
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      
+      if (tabName === 'stations') {
+        document.getElementById('stationsTab').classList.add('active');
+      } else if (tabName === 'thresholds') {
+        document.getElementById('thresholdsTab').classList.add('active');
+        // Refresh threshold list when switching to thresholds tab
+        renderThresholdList();
+      }
     }
 
     function closeSettings() {
@@ -948,11 +1249,9 @@
           body: JSON.stringify({ routes })
         });
 
-        if (res.ok) {
-          const data = await res.json();
-          console.log(`Server configured to fetch ${data.activeFeeds} feed(s) for routes: ${routes.join(", ")}`);
-        } else {
-          console.error("Failed to configure feeds");
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error("Failed to configure feeds:", res.status, res.statusText, errorText);
         }
       } catch (err) {
         console.error("Error configuring feeds:", err);
@@ -973,8 +1272,6 @@
         }
       });
 
-      console.log("Selected stops:", selectedStops);
-
       if (selectedStops.length === 0) {
         alert("Please select at least one station");
         return;
@@ -987,17 +1284,208 @@
       saveSelectedStops(selectedStops);
       closeSettings();
 
-      // Force a complete refresh
+      // Force a complete refresh - wait longer for server to fetch new feeds
+      // The server clears cache and starts fetching asynchronously, so we need to wait
       setTimeout(() => {
-        fetchDepartures();
-      }, 100);
+        fetchDeparturesWithRetry(3, 500); // Retry up to 3 times with 500ms delay
+      }, 800);
+    }
+    
+    // Retry mechanism for fetchDepartures when data might not be ready yet
+    async function fetchDeparturesWithRetry(maxRetries = 3, retryDelay = 500) {
+      let retryCount = 0;
+      
+      const attemptFetch = async () => {
+        try {
+          const STOPS = getSelectedStops();
+          if (STOPS.length === 0) {
+            return;
+          }
+          
+          // Quick check if API has data
+          const res = await fetch("/api/departures?stops=" + STOPS.join(","));
+          if (!res.ok) {
+            throw new Error(`API request failed: ${res.status}`);
+          }
+          
+          const data = await res.json();
+          
+          // If we have data or this is the last retry, proceed with normal fetch
+          if (data.departures && data.departures.length > 0) {
+            await fetchDepartures();
+          } else if (retryCount < maxRetries) {
+            retryCount++;
+            setTimeout(attemptFetch, retryDelay);
+          } else {
+            await fetchDepartures();
+          }
+        } catch (err) {
+          if (retryCount < maxRetries) {
+            retryCount++;
+            setTimeout(attemptFetch, retryDelay);
+          } else {
+            await fetchDepartures();
+          }
+        }
+      };
+      
+      await attemptFetch();
     }
 
     function resetToDefaults() {
       saveSelectedStops(DEFAULT_STOPS);
+      saveStationThresholds({});
       const searchInput = document.getElementById("stationSearch");
       searchInput.value = ""; // Clear search
       renderStationList();
+      renderThresholdList();
+    }
+
+    // Threshold management functions
+    function renderThresholdList() {
+      const container = document.getElementById("thresholdList");
+      const thresholds = getStationThresholds();
+      const selectedStops = getSelectedStops();
+      
+      // Get list of selected station names
+      const selectedStations = [];
+      selectedStops.forEach(stopId => {
+        const stationName = getStationName(stopId);
+        if (!selectedStations.includes(stationName)) {
+          selectedStations.push(stationName);
+        }
+      });
+
+      if (selectedStations.length === 0) {
+        container.innerHTML = '<div class="empty-state" style="padding: 20px; opacity: 0.5;">Select stations first to set thresholds</div>';
+        return;
+      }
+
+      let html = "";
+      
+      // Render existing thresholds
+      Object.entries(thresholds).forEach(([stationName, minutes]) => {
+        if (selectedStations.includes(stationName)) {
+          html += `
+            <div class="threshold-item">
+              <div class="threshold-station-name">${stationName}</div>
+              <div class="threshold-input-group">
+                <input 
+                  type="number" 
+                  class="threshold-input" 
+                  min="0" 
+                  max="60" 
+                  value="${minutes}"
+                  onchange="updateThreshold('${stationName}', this.value)"
+                />
+                <span class="threshold-label">min</span>
+                <button class="threshold-remove-btn" onclick="removeThreshold('${stationName}')" title="Remove">×</button>
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      // Add option to add new threshold
+      const stationsWithoutThreshold = selectedStations.filter(s => !thresholds[s]);
+      if (stationsWithoutThreshold.length > 0) {
+        html += `
+          <div class="threshold-item" id="addThresholdRow" style="display: none;">
+            <select class="threshold-select" id="newThresholdStation">
+              ${stationsWithoutThreshold.map(s => `<option value="${s}">${s}</option>`).join("")}
+            </select>
+            <div class="threshold-input-group">
+              <input 
+                type="number" 
+                class="threshold-input" 
+                id="newThresholdMinutes"
+                min="0" 
+                max="60" 
+                value="3"
+                placeholder="3"
+              />
+              <span class="threshold-label">min</span>
+              <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px; margin-left: 8px;" onclick="saveNewThreshold()">Add</button>
+              <button class="threshold-remove-btn" onclick="cancelAddThreshold()" title="Cancel">×</button>
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html || '<div class="empty-state" style="padding: 20px; opacity: 0.5;">No thresholds set</div>';
+    }
+
+    function addThresholdRow() {
+      const row = document.getElementById("addThresholdRow");
+      if (row) {
+        row.style.display = "flex";
+      } else {
+        // If row doesn't exist, re-render the list
+        renderThresholdList();
+        setTimeout(() => {
+          const newRow = document.getElementById("addThresholdRow");
+          if (newRow) newRow.style.display = "flex";
+        }, 10);
+      }
+    }
+
+    function cancelAddThreshold() {
+      const row = document.getElementById("addThresholdRow");
+      if (row) row.style.display = "none";
+    }
+
+    function saveNewThreshold() {
+      const stationSelect = document.getElementById("newThresholdStation");
+      const minutesInput = document.getElementById("newThresholdMinutes");
+      
+      if (!stationSelect || !minutesInput) return;
+      
+      const stationName = stationSelect.value;
+      const minutes = parseInt(minutesInput.value);
+      
+      if (isNaN(minutes) || minutes < 0) {
+        alert("Please enter a valid number of minutes (0-60)");
+        return;
+      }
+      
+      const thresholds = getStationThresholds();
+      thresholds[stationName] = minutes;
+      saveStationThresholds(thresholds);
+      
+      renderThresholdList();
+    }
+
+    function updateThreshold(stationName, minutes) {
+      const thresholds = getStationThresholds();
+      const mins = parseInt(minutes);
+      
+      if (isNaN(mins) || mins < 0) {
+        alert("Please enter a valid number of minutes (0-60)");
+        renderThresholdList(); // Reset to saved value
+        return;
+      }
+      
+      if (mins === 0) {
+        // Remove threshold if set to 0
+        delete thresholds[stationName];
+      } else {
+        thresholds[stationName] = mins;
+      }
+      
+      saveStationThresholds(thresholds);
+      
+      // Refresh departures to apply new threshold (no retry needed, just filtering change)
+      fetchDepartures();
+    }
+
+    function removeThreshold(stationName) {
+      const thresholds = getStationThresholds();
+      delete thresholds[stationName];
+      saveStationThresholds(thresholds);
+      renderThresholdList();
+      
+      // Refresh departures to apply removal
+      fetchDepartures();
     }
 
     // Stop names cache
@@ -1018,11 +1506,22 @@
 
     // Get station name from stop ID
     function getStationName(stopId) {
+      // First check POPULAR_STATIONS
       for (const station of POPULAR_STATIONS) {
         if (station.stops.includes(stopId)) {
           return station.name;
         }
       }
+      
+      // Then check ALL_STATIONS if loaded
+      if (ALL_STATIONS.length > 0) {
+        for (const station of ALL_STATIONS) {
+          if (station.stops.includes(stopId)) {
+            return station.name;
+          }
+        }
+      }
+      
       return "Unknown Station";
     }
 
@@ -1062,14 +1561,30 @@
           return;
         }
 
-        const res = await fetch("/api/departures?stops=" + STOPS.join(","));
+        const apiUrl = "/api/departures?stops=" + STOPS.join(",");
+        const res = await fetch(apiUrl);
+        
+        if (!res.ok) {
+          throw new Error(`API request failed: ${res.status}`);
+        }
+        
         const data = await res.json();
+        const departuresCount = data.departures ? data.departures.length : 0;
+        const cacheAge = data.updatedAt ? Date.now() - data.updatedAt : null;
+        
         const rowsEl = document.getElementById("rows");
 
-        if (!rowsEl) return;
+        if (!rowsEl) {
+          return;
+        }
 
         if (!data.departures || data.departures.length === 0) {
-          rowsEl.innerHTML = '<div class="empty-state">No departures available</div>';
+          // Show more helpful message if cache is very recent (might be reconfiguring)
+          if (cacheAge !== null && cacheAge < 5000) {
+            rowsEl.innerHTML = '<div class="empty-state">Loading departures... (server is fetching new data)</div>';
+          } else {
+            rowsEl.innerHTML = '<div class="empty-state">No departures available</div>';
+          }
           return;
         }
 
@@ -1102,6 +1617,8 @@
         });
 
         // Render grouped by station
+        const thresholds = getStationThresholds();
+        
         Object.values(stationGroups).forEach(station => {
           if (station.departures.length === 0) return;
 
@@ -1126,12 +1643,27 @@
           const selectedTrains = Object.values(routeDirections)
             .sort((a, b) => a.time - b.time);
 
+          // Get threshold for this station
+          const stationThreshold = thresholds[station.name] || 0;
+
           selectedTrains.forEach(dep => {
+            const mins = Math.max(0, Math.round((dep.time - now) / 60000));
+            
+            // Filter out trains below the threshold
+            if (mins < stationThreshold) {
+              return;
+            }
+
             const row = document.createElement("div");
             row.className = "row";
 
-            const mins = Math.max(0, Math.round((dep.time - now) / 60000));
-            const minsClass = mins <= 2 ? "soon" : "";
+            // Determine color class: soon (<=2min), near-threshold (within 2min of threshold), or default
+            let minsClass = "";
+            if (mins <= 2) {
+              minsClass = "soon";
+            } else if (stationThreshold > 0 && mins <= stationThreshold + 2) {
+              minsClass = "near-threshold";
+            }
 
             // Get destination name from stop ID (with fallback to direction)
             const destinationName = dep.destination ?
@@ -1146,7 +1678,6 @@
             const routeTextColor = getRouteTextColor(dep.route);
 
             row.innerHTML = `
-              <div class="time">${formatTime(dep.time)}</div>
               <div class="station">${destinationName}</div>
               <div><span class="route-pill" style="background: ${routeColor}; color: ${routeTextColor};">${dep.route}</span></div>
               <div class="mins ${minsClass}">${mins}</div>
@@ -1170,13 +1701,20 @@
       if (savedStops.length > 0) {
         const routes = extractRoutesFromStops(savedStops);
         await configureFeeds(routes);
+        setTimeout(() => {
+          fetchDeparturesWithRetry(3, 500); // Retry up to 3 times with 500ms delay
+        }, 800);
+      } else {
+        // Still try to fetch in case there are default stops or cached data
+        setTimeout(() => {
+          fetchDepartures();
+        }, 100);
       }
     })();
 
-    // Initial fetch
-    fetchDepartures();
     // Refresh every 15 seconds
     setInterval(fetchDepartures, 15000);
   </script>
 </body>
 </html>
+
